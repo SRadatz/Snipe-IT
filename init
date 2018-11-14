@@ -1,10 +1,50 @@
 #!/bin/sh
 
+#update
 sudo apt update -y
 sudo apt upgrade -y
+#LAMP
+sudo apt install apache2 apache2-utils libapache2-mod-php mariadb-server mariadb-client php php-pdo php-mbstring php-tokenizer php-curl php-mysql php-ldap php-zip php-fileinfo php-gd php-dom php-mcrypt php-bcmath -y
+
+sudo systemctl start apache2
+sudo systemctl enable apache2
+#check services systemctl | grep apache2
+
+#setup DB
+sudo mysql_secure_installation
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+
+#mysql -u root -p
+# snipeDB.sql
 
 sudo apt install git -y
 
-sudo apt install mysql-server
-#sql script
-mysql -u root -p /root/Snipe-IT/SnipeDB.sql
+cd /var/www/
+sudo git clone https://github.com/snipe/snipe-it.git
+
+cd snipe-it
+sudo cp .env.example .env
+#edit .env
+
+#setup permissions
+sudo chmod -R 755 storage
+sudo chmod -R 755 public/uploads
+sudo chown -R www-data:www-data storage public/uploads
+
+#setup composer
+sudo curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
+
+sudo composer install --no-dev –prefer-source
+sudo php artisan key:generate
+
+#edit apache sit configuration
+sudo vim /etc/apache2/sites-available/snipeit.conf
+
+sudo a2ensite snipeit.conf
+ssudo phpenmod mbstring
+sudo phpenmod mcrypt
+sudo a2enmod rewrite
+
+sudo systemctl restart apache2

@@ -1,4 +1,6 @@
 create database snipeit;
 
 create user snipe_user;
-grant all on snipeit.* to 'snipe_user'@'localhost' identified by 'YOUR_DB_PASSWORD_HERE'
+grant all on snipeit.* to 'snipe_user'@'localhost' identified by 'YOUR_DB_PASSWORD_HERE';
+FLUSH PRIVILEGES;
+exit; 
